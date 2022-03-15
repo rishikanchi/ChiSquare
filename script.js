@@ -51,6 +51,13 @@ function diCross(patTrait1, matTrait1, patTrait2, matTrait2, total, observedArra
     return output;
 }
 
+function sexLinkedMono(paternal, maternal, total, observedArray){
+    paternal = charToNumSex(paternal);
+    maternal = charToNumSex(maternal);
+
+    var expectedRatio = getPhenotypeSex(paternal, maternal);
+}
+
 function getPhenotype(paternal, maternal){
     var curPaternal;
     var curMaternal;
@@ -74,6 +81,37 @@ function getPhenotype(paternal, maternal){
     return ([dominant, recessive]);
 }
 
+function getPhenotypeSex(paternal, maternal){
+    var domMale = 0;
+    var domFemale = 0;
+    var recMale = 0;
+    var recFemale = 0;
+    var curPaternal;
+    var curMaternal;
+
+    for (let i=0; i<2; i++){
+        curPaternal = paternal[i]
+        for (let j=0; j<2; j++){
+            curMaternal = maternal[j];
+            const multi = curMaternal*curPaternal;
+            if (multi == 2){
+                domMale++;
+            }
+            else if (multi == 3){
+                recMale++;
+            }
+            else if (multi == 4 || multi == 6){
+                domFemale++;
+            }
+            else if (multi == 9){
+                recFemale++;
+            }
+        }
+    }
+
+    return ([domMale, recMale, domFemale, recFemale]);
+}
+
 function charToNum(geno){
     var output = ""
     for (let i=0; i<2;i++){
@@ -82,6 +120,23 @@ function charToNum(geno){
         } 
         else {
             output += "1";
+        }
+    }
+
+    return output;
+}
+
+function charToNumSex(geno){
+    var output = ""
+    for (let i=0; i<2;i++){
+        if ((geno[i]).toUpperCase() == "D"){
+            output += "2";
+        } 
+        else if ((geno[i]).toUpperCase() == "R"){
+            output += "3";
+        }
+        else {
+            output += "1"
         }
     }
 
@@ -98,10 +153,10 @@ function chiSquareEq(O, E){
 function displayTextBox(){
     var selected = document.getElementById('select').value;
     if (selected == "1"){
-        document.getElementById('textBox').innerHTML = "<input type='text' id='box1' placeholder='Paternal Genotype'>x<input type='text' id='box2' placeholder='Maternal Genotype'> <br><br>Observed <br>Total: <input type='text' id='total' placeholder='Total'> Dominant: <input type='text' id='dominant' placeholder='Dominant'> Recessive: <input type='text' id='recessive' placeholder='Recessive'>";
+        document.getElementById('textBox').innerHTML = "<input type='text' id='box1' placeholder='Paternal Genotype'>x<input type='text' id='box2' placeholder='Maternal Genotype'> <br><br>Observed <br>Total: <input type='text' id='total' placeholder='Total'><br> Dominant: <input type='text' id='dominant' placeholder='Dominant'> <br>Recessive: <input type='text' id='recessive' placeholder='Recessive'>";
     } 
     else if (selected == '2') {
-       document.getElementById('textBox').innerHTML = "Trait 1: <input type='text' id='box1' placeholder='Paternal Genotype'>x<input type='text' id='box2' placeholder='Maternal Genotype'><br>Trait 2: <input type='text' id='box3' placeholder='Paternal Genotype'>x<input type='text' id='box4' placeholder='Maternal Genotype'><br><br>Observed <br>Total: <input type='text' id='total' placeholder='total'> Dominant Dominant: <input type='text' id='domDom' placeholder='Dominant Dominant'> Dominant Recessive: <input type='text' id='domRec' placeholder='Dominant Recessive'>Recessive Dominant: <input type='text' id='recDom' placeholder='Recessive Dominant'>Recessive Recessive: <input type='text' id='recRec' placeholder='Recessive Recessive'>";
+       document.getElementById('textBox').innerHTML = "Trait 1 (T1): <input type='text' id='box1' placeholder='Paternal Genotype'>x<input type='text' id='box2' placeholder='Maternal Genotype'><br>Trait 2 (T2): <input type='text' id='box3' placeholder='Paternal Genotype'>x<input type='text' id='box4' placeholder='Maternal Genotype'><br><br>Observed <br>Total: <input type='text' id='total' placeholder='Total'><br> T1 Dominant T2 Dominant: <input type='text' id='domDom' placeholder='Dominant Dominant'><br> T1 Dominant T2 Recessive: <input type='text' id='domRec' placeholder='Dominant Recessive'><br>T1 Recessive T2 Dominant: <input type='text' id='recDom' placeholder='Recessive Dominant'><br>T1 Recessive T2 Recessive: <input type='text' id='recRec' placeholder='Recessive Recessive'>";
     }
 }
 
