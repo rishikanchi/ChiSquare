@@ -1,8 +1,8 @@
-function monoCross(paternal, maternal, total, observedArray){
-    var paternalNum = charToNum(paternal); //10
-    var maternalNum = charToNum(maternal); //10
+function monoCross(paternal, maternal, observedArray){
+    var phenoArray = getPhenotype(paternal, maternal); 
 
-    var phenoArray = getPhenotype(paternalNum, maternalNum);  //[3, 1]
+    const total = parseInt(observedArray[0]) + parseInt(observedArray[1]);
+    console.log(total);
     var expectedArray = [];
     for (let i=0; i<2; i++){
        const expected =  (phenoArray[i]/4)*total;
@@ -17,45 +17,20 @@ function monoCross(paternal, maternal, total, observedArray){
     return output;
 }
 
-function diCross(patTrait1, matTrait1, patTrait2, matTrait2, total, observedArray){
-    patTrait1 = charToNum(patTrait1);
-    matTrait1 = charToNum(matTrait1);
-    patTrait2 = charToNum(patTrait2);
-    matTrait2 = charToNum(matTrait2);
+function diCross(patTrait1, matTrait1, patTrait2, matTrait2, observedArray){
+    const domT1 = parseInt(observedArray[0]) + parseInt(observedArray[1]);
+    console.log('domT1: ', domT1);
+    const recT1 = parseInt(observedArray[2]) + parseInt(observedArray[3]);
+    console.log('recT1: ', recT1);
+    const domT2 = parseInt(observedArray[0]) + parseInt(observedArray[2]);
+    console.log('domT2: ', domT2);
+    const recT2 = parseInt(observedArray[1]) + parseInt(observedArray[3]);
+    console.log('recT2: ', recT2);
 
-    var t1pheno = getPhenotype(patTrait1, matTrait1);
-    var t2pheno = getPhenotype(patTrait2, matTrait2);
+    const trait1square = monoCross(patTrait1, matTrait1, [domT1, recT1]);
+    const trait2square = monoCross(patTrait2, matTrait2, [domT2, recT2]);
 
-    var fullPheno = [];
-    var t1Ratio;
-    var t2Ratio;
-    for (let i=0; i<2; i++){
-        t1Ratio = t1pheno[i];
-        for (let j=0; j<2; j++){
-            t2Ratio = t2pheno[j];
-            fullPheno.push(t1Ratio*t2Ratio);
-        }
-    }
-
-    var expectedArray =[];
-    for (let i=0; i<4; i++){
-        const expected =  (fullPheno[i]/16)*total;
-        expectedArray.push(expected);
-     }
-
-    var output = 0;
-    for (let i=0; i<4; i++){
-        output += chiSquareEq(observedArray[i], expectedArray[i]);
-    }
-    
-    return output;
-}
-
-function sexLinkedMono(paternal, maternal, total, observedArray){
-    paternal = charToNumSex(paternal);
-    maternal = charToNumSex(maternal);
-
-    var expectedRatio = getPhenotypeSex(paternal, maternal);
+    return (trait1square + trait2square);
 }
 
 function getPhenotype(paternal, maternal){
@@ -65,11 +40,11 @@ function getPhenotype(paternal, maternal){
     var recessive = 0;
 
     for (let i=0; i<2; i++){
-        curPaternal = parseInt(paternal[i]);
+        curPaternal = paternal[i];
 
         for (let j=0; j<2; j++){
-            curMaternal = parseInt(maternal[j]);
-            if (curPaternal*curMaternal == 0){
+            curMaternal = maternal[j];
+            if (curMaternal.toUpperCase() == "D" || curPaternal.toUpperCase() == "D"){
                 dominant++;
             }
             else{
@@ -81,68 +56,6 @@ function getPhenotype(paternal, maternal){
     return ([dominant, recessive]);
 }
 
-function getPhenotypeSex(paternal, maternal){
-    var domMale = 0;
-    var domFemale = 0;
-    var recMale = 0;
-    var recFemale = 0;
-    var curPaternal;
-    var curMaternal;
-
-    for (let i=0; i<2; i++){
-        curPaternal = paternal[i]
-        for (let j=0; j<2; j++){
-            curMaternal = maternal[j];
-            const multi = curMaternal*curPaternal;
-            if (multi == 2){
-                domMale++;
-            }
-            else if (multi == 3){
-                recMale++;
-            }
-            else if (multi == 4 || multi == 6){
-                domFemale++;
-            }
-            else if (multi == 9){
-                recFemale++;
-            }
-        }
-    }
-
-    return ([domMale, recMale, domFemale, recFemale]);
-}
-
-function charToNum(geno){
-    var output = ""
-    for (let i=0; i<2;i++){
-        if ((geno[i]).toUpperCase() == "D"){
-            output += "0";
-        } 
-        else {
-            output += "1";
-        }
-    }
-
-    return output;
-}
-
-function charToNumSex(geno){
-    var output = ""
-    for (let i=0; i<2;i++){
-        if ((geno[i]).toUpperCase() == "D"){
-            output += "2";
-        } 
-        else if ((geno[i]).toUpperCase() == "R"){
-            output += "3";
-        }
-        else {
-            output += "1"
-        }
-    }
-
-    return output;
-}
-
 function chiSquareEq(O, E){
     var output = Math.pow((O - E), 2);
     output /= E;
@@ -150,36 +63,53 @@ function chiSquareEq(O, E){
     return output;
 }
 
+instructStatus = false;
+function instructions(){
+    if (instructStatus == false){
+        document.getElementById('output').innerHTML = "Make sure to read the <strong>Terms and Conditions<strong> and click the check box before continuing."
+        document.getElementById('output').innerHTML += "<br><br> Monohybrid: Write the genotype of both parents using the letters 'D' for dominant trait and 'R' for recessive trait. Then, write the number of observed dominant cases in the dominant box and write the number of observed recessive cases in the recessive box and click calculate.";
+        document.getElementById('output').innerHTML += "<br><br> Dihybrid: Take the first trait as T1 and second trait at T2. Split each parent up into their separate traits (Ex. AaBb -> Aa and Bb). Remember that when you write the genotype of both traits, you use the letters 'D' for dominant trait and 'R' for recessive trait (ex. AA -> DD, aa -> RR). Then put the first trait alleles (ex. Aa -> DR) into the T1 textbox and do the same for the T2 textbox with the other trait (ex Bb -> DR). Then, for the bottom section, you have to put observed phenotype for each of the categories based on which trait is dominant or recessive <em><strong>Don't mess up the order of the traits, otherwise the program will not work.</strong></em> For example, if T1 is eyes and T2 is nose and wild type is dominant for both traits, if you get an observed value as 10 for wild eyes and wild nose, you should write that number in the T1 dominant T2 dominant box because the phenotype (wild type for both T1 and T2) is dominant for both T1 and T2. Then press calculate to get your result."
+        instructStatus = true;
+    }
+    else {
+        document.getElementById('output').innerHTML = "";
+        instructStatus = false;
+    }
+}
 function displayTextBox(){
     var selected = document.getElementById('select').value;
     if (selected == "1"){
-        document.getElementById('textBox').innerHTML = "<input type='text' id='box1' placeholder='Paternal Genotype'>x<input type='text' id='box2' placeholder='Maternal Genotype'> <br><br>Observed <br>Total: <input type='text' id='total' placeholder='Total'><br> Dominant: <input type='text' id='dominant' placeholder='Dominant'> <br>Recessive: <input type='text' id='recessive' placeholder='Recessive'>";
+        document.getElementById('textBox').innerHTML = "<input type='text' id='box1' placeholder='Paternal Genotype'>x<input type='text' id='box2' placeholder='Maternal Genotype'> <br><br>Observed <br> Dominant: <input type='text' id='dominant' placeholder='Dominant'> <br>Recessive: <input type='text' id='recessive' placeholder='Recessive'>";
     } 
     else if (selected == '2') {
-       document.getElementById('textBox').innerHTML = "Trait 1 (T1): <input type='text' id='box1' placeholder='Paternal Genotype'>x<input type='text' id='box2' placeholder='Maternal Genotype'><br>Trait 2 (T2): <input type='text' id='box3' placeholder='Paternal Genotype'>x<input type='text' id='box4' placeholder='Maternal Genotype'><br><br>Observed <br>Total: <input type='text' id='total' placeholder='Total'><br> T1 Dominant T2 Dominant: <input type='text' id='domDom' placeholder='Dominant Dominant'><br> T1 Dominant T2 Recessive: <input type='text' id='domRec' placeholder='Dominant Recessive'><br>T1 Recessive T2 Dominant: <input type='text' id='recDom' placeholder='Recessive Dominant'><br>T1 Recessive T2 Recessive: <input type='text' id='recRec' placeholder='Recessive Recessive'>";
+       document.getElementById('textBox').innerHTML = "Trait 1 (T1): <input type='text' id='box1' placeholder='Paternal Genotype'>x<input type='text' id='box2' placeholder='Maternal Genotype'><br>Trait 2 (T2): <input type='text' id='box3' placeholder='Paternal Genotype'>x<input type='text' id='box4' placeholder='Maternal Genotype'><br><br> T1 Dominant T2 Dominant: <input type='text' id='domDom' placeholder='Dominant Dominant'><br> T1 Dominant T2 Recessive: <input type='text' id='domRec' placeholder='Dominant Recessive'><br>T1 Recessive T2 Dominant: <input type='text' id='recDom' placeholder='Recessive Dominant'><br>T1 Recessive T2 Recessive: <input type='text' id='recRec' placeholder='Recessive Recessive'>";
     }
 }
 
 function calcClick(){
-    const selected = document.getElementById('select').value;
-    const paternal = document.getElementById('box1').value; 
-    const maternal = document.getElementById('box2').value;
-    const total = document.getElementById('total').value;
+    if (document.getElementById('rulesCheckbox').checked){
+        const selected = document.getElementById('select').value;
+        const paternal = document.getElementById('box1').value; 
+        const maternal = document.getElementById('box2').value;
 
-    if (selected == "1"){
-        const dominant = document.getElementById('dominant').value;
-        const recessive = document.getElementById('recessive').value;
-        const observedArray = [dominant, recessive];
+        if (selected == "1"){
+            const dominant = document.getElementById('dominant').value;
+            const recessive = document.getElementById('recessive').value;
+            const observedArray = [dominant, recessive];
 
-        document.getElementById('output').innerHTML = monoCross(paternal, maternal, total, observedArray);
+            document.getElementById('output').innerHTML = monoCross(paternal, maternal, observedArray);
+        }
+        else if (selected == "2"){
+            const paternal1 = document.getElementById('box3').value;
+            const maternal1 = document.getElementById('box4').value;
+            const domDom = document.getElementById('domDom').value;
+            const domRec = document.getElementById('domRec').value;
+            const recDom = document.getElementById('recDom').value;
+            const recRec = document.getElementById('recRec').value;
+            document.getElementById('output').innerHTML = diCross(paternal, maternal, paternal1, maternal1, [domDom, domRec, recDom, recRec]);  
+        }
     }
-    else if (selected == "2"){
-        const paternal1 = document.getElementById('box3').value;
-        const maternal1 = document.getElementById('box4').value;
-        const domDom = document.getElementById('domDom').value;
-        const domRec = document.getElementById('domRec').value;
-        const recDom = document.getElementById('recDom').value;
-        const recRec = document.getElementById('recRec').value;
-        document.getElementById('output').innerHTML = diCross(paternal, maternal, paternal1, maternal1, total, [domDom, domRec, recDom, recRec]);  
+    else{
+        alert('Please accept terms and conditions')
     }
 }

@@ -7,6 +7,10 @@
     <title>Chi Square</title>
     <script src="script.js"></script>
 <body><center>
+    <h1>Chi Square Calculator</h1>
+    <span style="font-size: 12px;color: red;">TERMS AND CONDITIONS: This is only for educational purposes only and should not be used for cheating. By clicking the checkbox, you swear to not cheat and if you do cheat, you will take full responsibility.</span> 
+    <input type="checkbox" id="rulesCheckbox" value="rulesCheckbox"> <br><br>
+    <input type="button" onclick="instructions()" value="Instructions"> <br><br>
     <select onclick="displayTextBox()" id="select">
         <option value="1">Monohybrid Cross</option>
         <option value="2">Dihybrid Cross</option>
@@ -17,12 +21,11 @@
     <div id="textBox">
         <input type="text" id="box1" placeholder="Paternal Genotype">x<input type="text" id="box2" placeholder="Maternal Genotype"> <br><br>
         Observed <br>
-        Total: <input type="text" id="total" placeholder="Total"><br> Dominant: <input type="text" id="dominant" placeholder="Dominant"><br> Recessive: <input type="text" id="recessive" placeholder="Recessive">
+        Dominant: <input type="text" id="dominant" placeholder="Dominant"><br> Recessive: <input type="text" id="recessive" placeholder="Recessive">
     </div> <br><br>
 
-    <input type="button" onclick="calcClick()" value="Calculate">
+    <input type="button" onclick="calcClick()" value="Calculate"> <br><br>
 
-    <div id="instructions"></div>
     <div id="output"></div>
 </center></body>
 </html>
