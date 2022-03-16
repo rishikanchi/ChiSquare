@@ -19,13 +19,9 @@ function monoCross(paternal, maternal, observedArray){
 
 function diCross(patTrait1, matTrait1, patTrait2, matTrait2, observedArray){
     const domT1 = parseInt(observedArray[0]) + parseInt(observedArray[1]);
-    console.log('domT1: ', domT1);
     const recT1 = parseInt(observedArray[2]) + parseInt(observedArray[3]);
-    console.log('recT1: ', recT1);
     const domT2 = parseInt(observedArray[0]) + parseInt(observedArray[2]);
-    console.log('domT2: ', domT2);
     const recT2 = parseInt(observedArray[1]) + parseInt(observedArray[3]);
-    console.log('recT2: ', recT2);
 
     const trait1square = monoCross(patTrait1, matTrait1, [domT1, recT1]);
     const trait2square = monoCross(patTrait2, matTrait2, [domT2, recT2]);
@@ -54,15 +50,28 @@ function sexCross(paternal, maternal, observedArray){
 
 function sexCrossTwoTraits(paternal, maternal, paternal1, maternal1, observedArray){
     //observedArray = [maleXDomDom, maleXDomRec, maleXRecDom, maleXRecRec, femXDomDom, femXDomRem, femXRecDom, femXRecRec]
-    const firstPheno = getSexPhenotype(paternal, maternal);
-    const secondPheno = getPhenotype(paternal1, maternal1);
+    const sexPheno = getSexPhenotype(paternal, maternal);
+    const normalPheno = getPhenotype(paternal1, maternal1);
     
     var total = 0;
     for (let i=0; i<observedArray.length; i++){
         total += parseInt(observedArray[i])
     }
     
-    const maleXDom = observed[0] + observed[1];
+    const maleXDom = parseInt(observed[0]) + parseInt(observed[1]);
+    const maleXRec = parseInt(observed[2]) + parseInt(observed[3]);
+    const femXDom = parseInt(observed[4]) + parseInt(observed[5]);
+    const femXRec = parseInt(observed[6]) + parseInt(observed[7]);
+    const sexObserved = [maleXDom, maleXRec, femXDom, femXRec];
+    
+    const sexChi = sexCross(paternal, maternal, observedArray);
+    
+    const normDom = parseInt(observed[0]) + parseInt(observed[2]) + parseInt(observed[4]) + parseInt(observed[6]);
+    const normRec = parseInt(observed[1]) + parseInt(observed[3]) + parseInt(observed[5]) + parseInt(observed[7]);
+    const normChi = monoCross(paternal1, maternal1, [normDom, normRec])
+    
+    return (normChi + sexChi);
+    }
 }
 function getPhenotype(paternal, maternal){
     var curPaternal;
