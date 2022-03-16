@@ -52,6 +52,18 @@ function sexCross(paternal, maternal, observedArray){
     return output;
 }
 
+function sexCrossTwoTraits(paternal, maternal, paternal1, maternal1, observedArray){
+    //observedArray = [maleXDomDom, maleXDomRec, maleXRecDom, maleXRecRec, femXDomDom, femXDomRem, femXRecDom, femXRecRec]
+    const firstPheno = getSexPhenotype(paternal, maternal);
+    const secondPheno = getPhenotype(paternal1, maternal1);
+    
+    var total = 0;
+    for (let i=0; i<observedArray.length; i++){
+        total += parseInt(observedArray[i])
+    }
+    
+    const maleXDom = observed[0] + observed[1];
+}
 function getPhenotype(paternal, maternal){
     var curPaternal;
     var curMaternal;
